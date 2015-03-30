@@ -1,0 +1,8 @@
+Thumbs.db
+.idea/
+venv/
+donottrack/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
