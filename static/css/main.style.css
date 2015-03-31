@@ -36,3 +36,7 @@ nav a:hover {
 #create-button {
     display: none;
 }
+
+pre > code {
+    white-space: nowrap;
+}

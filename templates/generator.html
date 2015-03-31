@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" id="page-container">
+    <h2>Generate boilerblate code.</h2>
+    <div class="row">
+
+        <div class="six columns">
+            <p>If you have created database tables you can inspect database and
+                let <strong>BMG</strong> to create models file or write mapping by yourself. Then
+                you can generate code for views, forms and controllers for CRUD
+                operations.
+                We strongly recommend use inspect future as your start point and
+                then manually correct models file.
+            </p>
+            <a class="button" href="#">Inspect database</a>
+        </div>
+
+        <div class="six columns">
+            <p>Without tables defined in database you can write your models in
+                python-module (models.py by default) and BMG will generate them
+                for you alongside with other files.
+            </p>
+            <a class="button" href="#">Generate</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

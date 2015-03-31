@@ -1,5 +1,5 @@
 from bottle import run
-from app.views import *
+from bmgapp.views import *
 
 
 if __name__ == '__main__':

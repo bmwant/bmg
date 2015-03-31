@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" id="page-container">
+    <div class="row">
+        <div class="twelve columns">
+            <div class="row" id="form-container"></div>
+
+            <input class="button" type="button" value="Back" id="prev-button">
+            <input class="button-primary" type="button" value="Next" id="next-button">
+            <input class="button-primary" type="button" value="Create" id="create-button">
+        </div>
+    </div>
+</div>
+
+{% raw %}
+<script id="page1" type="text/x-handlebars-template">
+<form>
+    <div class="twelve columns">
+        <h3>Create project</h3>
+        <div class="row">
+            <div class="six columns">
+                <label>Enter project name</label>
+                <input class="u-full-width" type="text" placeholder="Application" name="name" value="{{ this.name }}">
+            </div>
+        </div>
+    </div>
+</form>
+</script>
+
+<script id="page2" type="text/x-handlebars-template">
+<form>
+    <div class="twelve columns">
+        <h3>Configure database</h3>
+        <div class="row">
+            <div class="three columns">
+                <label>Database name</label>
+                <input class="u-full-width" type="text" name="dbname" placeholder="appdb" required value="{{ this.dbname }}">
+            </div>
+            <div class="three columns">
+                <label>Connection host</label>
+                <input class="u-full-width" type="text" name="host" placeholder="127.0.0.1" required value="{{ this.host }}">
+            </div>
+            <div class="three columns">
+                <label>Connection port</label>
+                <input class="u-full-width" type="number" name="port" placeholder="3306" value="{{ this.port }}">
+            </div>
+            <div class="three columns">
+                <label>Database backend</label>
+                <select class="u-full-width" name="dbbackend">
+                    <option value="mysql">MySQL</option>
+                    <option value="sqlite">SQLite</option>
+                    <option value="postgresql">PostgreSQL</option>
+                </select>
+                <script>setDropdown("select[name=dbbackend]", "{{ this.dbbackend }}");<{{!}}/script>
+            </div>
+
+        </div>
+
+        <div class="row">
+
+            <div class="three columns">
+                <label>Username</label>
+                <input class="u-full-width" name="username" type="text"  placeholder="Your username" value="{{ this.username }}">
+            </div>
+            <div class="three columns">
+                <label>Password</label>
+                <input class="u-full-width" name="password" type="password" placeholder="Your password" value="{{ this.password }}">
+            </div>
+
+        </div>
+    </div>
+</form>
+</script>
+
+<script id="page3" type="text/x-handlebars-template">
+<form>
+    <div class="twelve columns">
+        <h3>Choose your favourite css-framework</h3>
+        <div class="row">
+
+            <div class="three columns">
+                <label>CSS framework</label>
+                <select class="u-full-width" name="cssframework">
+                    <option value="bootstrap">Twitter Bootstrap</option>
+                    <option value="foundation">Zurb Foundation</option>
+                    <option value="kube">Kube</option>
+                    <option value="uikit">UIKit</option>
+                    <option value="semantic">Semantic UI</option>
+                </select>
+                <script>setDropdown("select[name=cssframework]", "{{ this.cssframework }}");<{{!}}/script>
+            </div>
+
+        </div>
+
+    </div>
+</form>
+</script>
+
+<script id="page4" type="text/x-handlebars-template">
+<form>
+    <div class="twelve columns">
+        <h3>Almost done!</h3>
+        <div class="row">
+            <p>Check all entered data and click <em>Create</em>. If you want to correct some entered data feel free to go <em>Back</em></p>
+            <div class="six columns">
+
+                <p><strong>Project name:</strong> {{ this.name }} </p>
+                <p><strong>Database name:</strong> {{ this.dbname}} </p>
+                <p><strong>Database backend:</strong> {{ this.dbbackend }} </p>
+                <p><strong>Database username:</strong> {{ this.username }}</p>
+                <p><strong>Database password:</strong> {{ this.password }}</p>
+                <p><strong>Database host:</strong> {{ this.host }}</p>
+                <p><strong>Database port:</strong> {{ this.port }}</p>
+                <p><strong>CSS-framework:</strong> {{ this.cssframework }}</p>
+
+
+            </div>
+
+        </div>
+
+    </div>
+</form>
+</script>
+{% endraw %}
+
+{% endblock %}
+
+{% block bottom_scripts %}
+<script>
+    $(document).ready(function() {
+        //Enable resuming from the last page
+        if(!localStorage.currentPageNum) {
+            cleanData(); //Remove accidental previous data
+            localStorage.currentPageNum = 1;
+        }
+        loadPage(localStorage.currentPageNum);
+    });
+
+    function loadPage(pageNum) {
+        //Check if exist
+        var getPage = $("#page"+pageNum);
+        if(!getPage.length) return;
+
+        var nextPageNum = Number(pageNum) + 1;
+        var hasNext = $("#page"+nextPageNum);
+        if(!hasNext.length) {
+            //This is the last page. Show 'Create button'
+            $("#create-button").css("display", "inline-block");
+            $("#next-button").css("display", "none");
+        } else {
+            //Every other page. Ensure that 'Next' button is showed instead of 'Create'
+            $("#create-button").css("display", "none");
+            $("#next-button").css("display", "inline-block");
+        }
+
+        if(pageNum == 1) {
+            $("#prev-button").css("display", "none");
+        } else {
+            $("#prev-button").css("display", "inline-block");
+        }
+
+        var source = $("#page"+pageNum).html();
+        var data = getDataFromLS();
+        var template = Handlebars.compile(source);
+        var resHtml = template(data);
+        $("#form-container").html(resHtml);
+        localStorage.currentPageNum = pageNum;
+    }
+
+    $("#prev-button").click(function() {
+        var prevPageNum = Number(localStorage.currentPageNum) - 1;
+        if(prevPageNum < 1) {
+            return;
+        }
+        loadPage(prevPageNum);
+    });
+
+
+    $("#next-button").click(function() {
+
+        var formContainer = $("#form-container");
+        var form = formContainer.find("form");
+        $.each(form.serializeArray(), function(index, data) {
+            console.log(data.name + "->" + data.value);
+            localStorage.setItem(data.name, data.value);
+        });
+
+        var nextPageNum = Number(localStorage.currentPageNum) + 1;
+        loadPage(nextPageNum);
+
+    });
+
+    function getDataFromLS() {
+        var data = {};
+        for (var i = 0; i < localStorage.length; i++) {
+            var key = localStorage.key(i);
+            data[key] = localStorage.getItem(key);
+        }
+        return data;
+    }
+
+    function cleanData() {
+        localStorage.clear();
+    }
+
+
+    function setDropdown(selector, value) {
+        if(value) {
+            $(selector).val(value);
+        }
+    }
+
+    $("#create-button").click(function () {
+        var data = getDataFromLS();
+        $.post("/create", data, function(data) {
+            sweetAlert({
+                title: "Good job",
+                text: "Project was created",
+                type:"success"
+            },
+            function() {
+                cleanData();
+                location = '/done';
+            });
+        }).error(function() {
+            sweetAlert("Server error", "Check your input and try again", "error");
+        });
+    });
+</script>
+{% endblock %}
+

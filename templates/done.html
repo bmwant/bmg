@@ -1,84 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+{% extends "base.html" %}
 
-  <!-- Basic Page Needs
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta charset="utf-8">
-  <title>Your page title here :)</title>
-  <meta name="description" content="">
-  <meta name="author" content="">
+{% block content %}
+<div class="container" id="page-container">
+    <h2>You've just created new project. Congratulations!</h2>
+    <div class="row">
 
-  <!-- Mobile Specific Metas
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+        <div class="six columns">
+            <p>Now go back to your console window and type:
+            <pre><code>python run.py</code></pre>
+            Then you can check your project running on http://localhost:8783.
+            Just click on this url or type it manually in your browsers' address
+            bar.
+            </p>
+        </div>
 
-  <!-- FONT
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+        <div class="six columns">
+            <p>If you found some bug or want to suggest an improvement feel free
+                to <a href="mailto:bmwant@gmail.com">contact me</a>.
 
-  <!-- CSS
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link rel="stylesheet" href="../static/css/normalize.css">
-  <link rel="stylesheet" href="../static/css/skeleton.css">
-  <link rel="stylesheet" href="../static/css/main.style.css">
-
-  <!-- Favicon
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link rel="icon" type="image/png" href="../static/favicon.png">
-
-</head>
-<body>
-
-  <!-- Primary Page Layout
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <div class="container">
-      
-      <div class="row">
-          <div class="twelve columns">
-            <form>
-              <div class="row">
-                <div class="three columns">
-                  <label for="exampleEmailInput">Database name</label>
-                  <input class="u-full-width" type="text" placeholder="appdb" required>
-                </div>
-                  <div class="three columns">
-                  <label for="exampleRecipientInput">Connection host</label>
-                   <input class="u-full-width" type="text" placeholder="127.0.0.1" id="exampleEmailInput" required>                     
-
-
-                </div>
-                  <div class="three columns">
-                  <label for="exampleEmailInput">Connection port</label>
-                  <input class="u-full-width" type="number" placeholder="3306" id="exampleEmailInput">
-                </div>
-                  <div class="three columns">
-                  <label for="exampleRecipientInput">Database backend</label>
-                  <select class="u-full-width" id="exampleRecipientInput">
-                    <option value="Option 1">MySQL</option>
-                    <option value="Option 2">SQLite</option>
-                    <option value="Option 3">PostgreSQL</option>
-                  </select>
-                </div>
-              </div>
-                <div class="row">
-                    <div class="three columns">
-                      <label for="exampleEmailInput">Username</label>
-                      <input class="u-full-width" type="text" placeholder="Your username" id="exampleEmailInput">
-                    </div>
-                    <div class="three columns">
-                      <label for="exampleEmailInput">Password</label>
-                      <input class="u-full-width" type="password" placeholder="Your password" id="exampleEmailInput">
-                    </div>
-                </div>
-              <input class="button-primary" type="submit" value="Next">
-            </form>
-          </div>
-      </div>
-
-  </div>
-
-<!-- End Document
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-</body>
-</html>
+            </p>
+            <p>Want to contribute? <a href="https://github.com/bmwant21/bmg" target="_blank">Link to Github</a>.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

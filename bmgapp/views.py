@@ -1,7 +1,8 @@
 from bottle import route, static_file, request
 
-from app import view
-from app.creator import Creator
+from bmgapp import view
+from bmgapp.creator import Creator
+
 
 @route('/hello')
 def hello():
@@ -10,8 +11,17 @@ def hello():
 
 @route('/')
 @view('index.html')
-def index():
-    pass
+def index(): pass
+
+
+@route('/creator')
+@view('creator.html')
+def creator(): pass
+
+
+@route('/generator')
+@view('generator.html')
+def creator(): pass
 
 
 @route('/create', method=['POST'])
