@@ -1,7 +1,7 @@
-from bottle import route, static_file
-from bottle import jinja2_view as view
+from bottle import route, static_file, request
 
-
+from app import view
+from app.creator import Creator
 
 @route('/hello')
 def hello():
@@ -14,9 +14,16 @@ def index():
     pass
 
 
-@route('/dbconfig')
-@view('db.html')
+@route('/create', method=['POST'])
 def index():
+    c = Creator(**request.POST)
+    c.create()
+    return 'Ok'
+
+
+@route('/done')
+@view('done.html')
+def done():
     pass
 
 

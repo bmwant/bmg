@@ -19,6 +19,20 @@ nav header {
     font-size: 18px;
 }
 
+nav header, nav a {
+    display: inline-block;
+}
+
+nav > a {
+    font-size: 0.8em;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
 nav a:hover {
     color: #33C3F0;
+}
+
+#create-button {
+    display: none;
 }

@@ -1,7 +1,5 @@
-from bottle import run, TEMPLATE_PATH
+from bottle import run
 from app.views import *
-
-TEMPLATE_PATH[:] = ['templates']
 
 
 if __name__ == '__main__':
