@@ -5,6 +5,7 @@ from bottle import route, static_file, request, post, get
 from bmgapp import view, render_template
 from bmgapp.creator import Creator
 from bmgapp.generator import Generator
+from bmgapp.helpers import get_only_files
 
 
 @route('/hello')
@@ -38,7 +39,7 @@ def create():
 
 @route('/done')
 def done():
-    return render_template('done.html', run_port=current_project['run_port'])
+    return render_template('done.html', **current_project)
 
 
 """ Generate code section """
@@ -47,13 +48,16 @@ def done():
 @route('/gen')
 @view('generator.html')
 def generator():
-    pass
+    modules = get_only_files('benedict/app', ext='.py', full_path=False)
+    return {'modules': modules}
 
 
 @route('/check_models')
 def check_models():
     g = Generator()
-    models_list = g.get_models('models.py')
+    print(request.GET['module'])
+    models_list = g.get_models(request.GET['module'])
+    print(models_list)
     return json.dumps(models_list)
 
 

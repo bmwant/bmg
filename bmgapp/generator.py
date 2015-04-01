@@ -82,4 +82,40 @@ class Generator(object):
                     _print_table(table, seen)
 
     def get_models(self, models_file):
-        return ['Book', 'Author', 'User', 'City']
+        result = []
+        import pyclbr
+        module = 'app.models'
+        m = pyclbr.readmodule(module, path=['benedict'])
+        for value in m.itervalues():
+            if value.module == module:
+                base = value.super[0]
+                if hasattr(base, 'name') and base.name == 'BaseModel':
+                    result.append(value.name)
+        return result
+
+    def generate_model_data(self, model_name=None):
+        import os
+        import inspect
+        import sys
+        import importlib
+        sys.path.insert(0, 'benedict')
+        models = importlib.import_module('app.models')
+
+
+        for name, obj in inspect.getmembers(models, inspect.isclass):
+            if obj.__module__ == models.__name__:
+                print(name)
+
+
+    def list_models(self, module_name='models'):
+        import pyclbr
+        module = module_name
+        m = pyclbr.readmodule(module)
+        print('Models in %s module:' % module_name)
+        counter = 1
+        for value in m.itervalues():
+            if value.module == module:
+                base = value.super[0]
+                if hasattr(base, 'name') and base.name == 'BaseModel':
+                    print('[%s]: %s' % (counter, value.name))
+                    counter += 1

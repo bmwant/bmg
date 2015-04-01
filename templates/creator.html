@@ -32,6 +32,7 @@
 <form>
     <div class="twelve columns">
         <h3>Configure database</h3>
+
         <div class="row">
 
             <div class="three columns">
@@ -44,6 +45,10 @@
                 </select>
                 <script>setDropdown("select[name=dbbackend]", "{{ this.dbbackend }}");<{{!}}/script>
             </div>
+
+        </div>
+
+        <div class="row" id="form-row-2">
 
             <div class="three columns">
                 <label>Database name</label>
@@ -62,7 +67,7 @@
 
         </div>
 
-        <div class="row">
+        <div class="row" id="form-row-3">
 
             <div class="three columns">
                 <label>Username</label>
@@ -111,12 +116,14 @@
             <div class="six columns">
 
                 <p><strong>Project name:</strong> {{ this.name }} </p>
+                {{#if this.with_db }}
                 <p><strong>Database name:</strong> {{ this.dbname}} </p>
                 <p><strong>Database backend:</strong> {{ this.dbbackend }} </p>
                 <p><strong>Database username:</strong> {{ this.username }}</p>
                 <p><strong>Database password:</strong> {{ this.password }}</p>
                 <p><strong>Database host:</strong> {{ this.host }}</p>
                 <p><strong>Database port:</strong> {{ this.port }}</p>
+                {{/if }}
                 <p><strong>CSS-framework:</strong> {{ this.cssframework }}</p>
 
 
@@ -140,6 +147,25 @@
             localStorage.currentPageNum = 1;
         }
         loadPage(localStorage.currentPageNum);
+    });
+
+    $(document).on("change", "select[name=dbbackend]", function() {
+        var form = $("#form-container").find("form");
+        console.log(form);
+        $.each(form, function(key, value) {
+            console.log(value);
+        });
+
+        var selectedBackend = $(this).val();
+        if(selectedBackend == "nodb") {
+            $("#form-row-2").css("display", "none");
+            $("#form-row-3").css("display", "none");
+            localStorage.removeItem("with_db");
+        } else {
+            $("#form-row-2").css("display", "block");
+            $("#form-row-3").css("display", "block");
+            localStorage.setItem("with_db", 1);
+        }
     });
 
     function loadPage(pageNum) {
@@ -173,24 +199,26 @@
         localStorage.currentPageNum = pageNum;
     }
 
+    function saveDataToLS() {
+        var formContainer = $("#form-container");
+        var form = formContainer.find("form");
+        $.each(form.serializeArray(), function(index, data) {
+            //console.log(data.name + "->" + data.value);
+            localStorage.setItem(data.name, data.value);
+        });
+    }
+
     $("#prev-button").click(function() {
         var prevPageNum = Number(localStorage.currentPageNum) - 1;
         if(prevPageNum < 1) {
             return;
         }
+        saveDataToLS();
         loadPage(prevPageNum);
     });
 
-
     $("#next-button").click(function() {
-
-        var formContainer = $("#form-container");
-        var form = formContainer.find("form");
-        $.each(form.serializeArray(), function(index, data) {
-            console.log(data.name + "->" + data.value);
-            localStorage.setItem(data.name, data.value);
-        });
-
+        saveDataToLS();
         var nextPageNum = Number(localStorage.currentPageNum) + 1;
         loadPage(nextPageNum);
 
@@ -213,6 +241,7 @@
     function setDropdown(selector, value) {
         if(value) {
             $(selector).val(value);
+            $(selector).change(); //fire change
         }
     }
 

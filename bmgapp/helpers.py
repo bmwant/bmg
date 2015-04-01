@@ -22,8 +22,9 @@ def get_list_of_files(directory, ext='', full_path=True):
             yield file_path
 
 
-def get_only_files(directory, full_path=True):
+def get_only_files(directory, ext='', full_path=True):
     for file_name in os.listdir(directory):
         path = os.path.join(directory, file_name)
         if not os.path.isdir(path):
-            yield path if full_path else file_name
+            if file_name.endswith(ext):
+                yield path if full_path else file_name

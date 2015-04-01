@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{% block title %}Kube Web Framework{% endblock %}</title>
+    <title>{% block title %}{{ app.project_name }} application{% endblock %}</title>
  
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -15,14 +15,18 @@
  
 </head>
 <body>
-    <nav class="navbar navbar-pills navbar-pills-black-example">
-        <ul>
-            <li><a href="/" class="active">Home</a></li>
-            <li><a href="/components">Showcase</a></li>
-            <li><a href="/about">About</a></li>
-        </ul>
-    </nav>
-    {% block content %}
-    {% endblock %}
+    <header class="text-centered" id="project-header">{{ app.project_name }}</header>
+
+    <div id="main">
+        <nav class="navbar navbar-pills navbar-pills-black-example">
+            <ul>
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/components">Showcase</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+        </nav>
+        {% block content %}
+        {% endblock %}
+    </div>
 </body>
 </html>

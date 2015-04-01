@@ -6,7 +6,6 @@ class Config(object):
     RELOADER = True
     RUN_HOST = '127.0.0.1'
     RUN_PORT = {{ run_port }}
-
     {% if with_db %}
     DB_NAME = '{{ db_name }}'
     DB_USER = '{{ db_user }}'
@@ -18,7 +17,7 @@ class Config(object):
 class DevelopmentConfig(Config):
     """
     Specify all additional configuration variables here.
-    Also you can create as many configurations as you want with their own
+    Also you can create as many configurations a s you want with their own
     unique parameters.
     """
     pass

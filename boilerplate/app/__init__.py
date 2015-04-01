@@ -12,7 +12,7 @@ db.get_conn().ping(True)
 {% endif %}
 
 app = Bottle()
-
+app.project_name = '{{ project_name }}'
 #Install plugins here
 
 env = Environment(loader=FileSystemLoader('templates'))

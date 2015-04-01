@@ -75,6 +75,7 @@ class Creator(object):
             if file_name in self.NEED_COMPILE:
                 self.compile_module(module_file)
 
+
     def compile_module(self, module_file):
         print('Compiling %s' % module_file)
 
@@ -83,6 +84,6 @@ class Creator(object):
 
         with open(module_file, 'w') as fout:
             jinja_template = Template(template)
-            result = jinja_template.render(with_db=False, run_port=self.run_port, secret_key=self.secret_key)
+            result = jinja_template.render(**self.__dict__)
             fout.write(result)
 

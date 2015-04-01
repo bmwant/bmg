@@ -40,3 +40,7 @@ nav a:hover {
 pre > code {
     white-space: nowrap;
 }
+
+#form-row-2, #form-row-3 {
+    display: none;
+}

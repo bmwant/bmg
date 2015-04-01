@@ -10,8 +10,10 @@
                 <div class="row">
                     <div class="six-columns">
                         <label>Select models file</label>
-                        <select class="u-full-width">
-                            <option value="models.py">models.py</option>
+                        <select class="u-full-width" name="module">
+                            {% for module in modules %}
+                            <option value="{{ module }}">{{ module }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
@@ -64,8 +66,9 @@
     {{ super() }}
     <script>
         $("#check-button").click(function () {
-            var data = {};
-            $.getJSON("/check_models", data, function(data) {
+            $.getJSON("/check_models", {
+                module: $("select[name=module]").val()
+            }, function(data) {
                 var source = $("#select-class-view").html();
                 var template = Handlebars.compile(source);
                 var resHtml = template(data);
