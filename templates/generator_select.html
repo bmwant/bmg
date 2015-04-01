@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" id="page-container">
+    <h2>Generate boilerblate code.</h2>
+    <div class="row">
+
+        <div class="six columns">
+            <p>If you have created database tables you can inspect database and
+                let <strong>BMG</strong> to create models file and manually
+                correct if needed. Then you can generate code for views, forms
+                and controllers for CRUD operations.
+            </p>
+            <a class="button" href="#" onclick="return false;" id="inspect-button">Inspect database</a>
+        </div>
+
+        <div class="six columns">
+            <p>Without tables defined in database you can write your models in
+                python-module (<em>models.py</em> by default) and <strong>BMG</strong>
+                will generate them for you alongside with other files.
+            </p>
+            <a class="button" href="#">Generate on models</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block bottom_scripts %}
+    {{ super() }}
+    <script>
+        $("#inspect-button").click(function () {
+            var data = {};
+            $.get("/inspect", data, function(data) {
+                sweetAlert({
+                    title: "Well done",
+                    text: "Models from your database was created",
+                    type: "success"
+                },
+                function() {
+                    location = '/gen';
+                });
+            }).error(function() {
+                sweetAlert("Server error", "Something wrong with database inspecting", "error");
+            });
+        });
+    </script>
+{% endblock %}
+

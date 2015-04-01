@@ -33,26 +33,31 @@
     <div class="twelve columns">
         <h3>Configure database</h3>
         <div class="row">
-            <div class="three columns">
-                <label>Database name</label>
-                <input class="u-full-width" type="text" name="dbname" placeholder="appdb" required value="{{ this.dbname }}">
-            </div>
-            <div class="three columns">
-                <label>Connection host</label>
-                <input class="u-full-width" type="text" name="host" placeholder="127.0.0.1" required value="{{ this.host }}">
-            </div>
-            <div class="three columns">
-                <label>Connection port</label>
-                <input class="u-full-width" type="number" name="port" placeholder="3306" value="{{ this.port }}">
-            </div>
+
             <div class="three columns">
                 <label>Database backend</label>
                 <select class="u-full-width" name="dbbackend">
+                    <option value="nodb">Without database</option>
                     <option value="mysql">MySQL</option>
                     <option value="sqlite">SQLite</option>
                     <option value="postgresql">PostgreSQL</option>
                 </select>
                 <script>setDropdown("select[name=dbbackend]", "{{ this.dbbackend }}");<{{!}}/script>
+            </div>
+
+            <div class="three columns">
+                <label>Database name</label>
+                <input class="u-full-width" type="text" name="dbname" placeholder="appdb" required value="{{ this.dbname }}">
+            </div>
+
+            <div class="three columns">
+                <label>Connection host</label>
+                <input class="u-full-width" type="text" name="host" placeholder="127.0.0.1" required value="{{ this.host }}">
+            </div>
+
+            <div class="three columns">
+                <label>Connection port</label>
+                <input class="u-full-width" type="number" name="port" placeholder="3306" value="{{ this.port }}">
             </div>
 
         </div>

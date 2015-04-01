@@ -4,11 +4,12 @@ from peewee import MySQLDatabase, PostgresqlDatabase, SqliteDatabase
 
 from config import Config as config
 
-
-#db = MySQLDatabase(config.DB_NAME,
-#    host=config.DB_HOST, port=config.DB_PORT,
-#    user=config.DB_USER, password=config.DB_PASS)
-#db.get_conn().ping(True)
+{% if with_db %}
+db = MySQLDatabase(config.DB_NAME,
+                   host=config.DB_HOST, port=config.DB_PORT,
+                   user=config.DB_USER, password=config.DB_PASS)
+db.get_conn().ping(True)
+{% endif %}
 
 app = Bottle()
 

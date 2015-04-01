@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 class Config(object):
-    SECRET_KEY = 'some-secret-key'
-    DB_NAME = ''
-    DB_USER = ''
-    DB_PASS = ''
+    SECRET_KEY = '{{ secret_key }}'
+    STATIC_FOLDER = 'static/'
     DEBUG = True
     RELOADER = True
     RUN_HOST = '127.0.0.1'
-    RUN_PORT = 8778
-    STATIC_FOLDER = 'static/'
+    RUN_PORT = {{ run_port }}
 
+    {% if with_db %}
+    DB_NAME = '{{ db_name }}'
+    DB_USER = '{{ db_user }}'
+    DB_PASS = '{{ db_password }}'
+    DB_HOST = '{{ db_host }}'
+    DB_PORT = {{ db_port }}
+    {% endif %}
 
 class DevelopmentConfig(Config):
     """
