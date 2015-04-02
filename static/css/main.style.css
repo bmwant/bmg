@@ -44,3 +44,9 @@ pre > code {
 #form-row-2, #form-row-3 {
     display: none;
 }
+
+.caution {
+    padding: 5px;
+    border: 2px solid #F27474;
+    border-radius: 4px;
+}

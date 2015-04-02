@@ -1,4 +1,5 @@
 import json
+import logging
 
 from bottle import route, static_file, request, post, get
 
@@ -8,8 +9,12 @@ from bmgapp.generator import Generator
 from bmgapp.helpers import get_only_files
 
 
+logger = logging.getLogger(__name__)
+
+
 @route('/hello')
 def hello():
+    logger.info('asdfadsf')
     return "Hello World!"
 
 
@@ -55,9 +60,7 @@ def generator():
 @route('/check_models')
 def check_models():
     g = Generator()
-    print(request.GET['module'])
     models_list = g.get_models(request.GET['module'])
-    print(models_list)
     return json.dumps(models_list)
 
 
@@ -69,7 +72,9 @@ def generator_select():
 
 @post('/generate')
 def generate():
+    g = Generator()
     print(request.POST.items())
+    g.generate_model_data(module_name=None, model_name=request.POST['model-class'])  #todo: project-specific data from global dict
     return 'Ok'
 
 

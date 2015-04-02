@@ -31,6 +31,7 @@
 <form>
     <div class="row">
         <div class="six-columns">
+            {{#if this }}
             <label>Select model class</label>
             <select class="u-full-width" name="model-class">
                 {{#each this }}
@@ -52,11 +53,18 @@
                 <input type="checkbox" checked name="views-check">
                 <span class="label-body">Views</span>
             </label>
-
+            {{else }}
+            <p class="caution">Seems like this is not models-file or you have not
+            wrote there models yet. Write them or try to select another file (<em>models.py</em>
+            by default).
+            </p>
+            {{/if }}
         </div>
     </div>
 </form>
+{{#if this }}
 <a class="button button-primary" href="#" onclick="return false;" id="generate-button">Generate</a>
+{{/if }}
 </script>
 {% endraw %}
 {% endblock %}
@@ -76,12 +84,22 @@
             });
         });
 
+        $("select[name=module]").change(function() {
+            $("#second-row").empty();
+        });
+
         $(document).on("click", "#generate-button", function () {
             var form = $("#second-row").find("form");
             var data = form.serialize();
             $.post("/generate", data, function(data) {
-                console.log(data);
-            });
+                sweetAlert({
+                    title: "Great news",
+                    text: "All data for the model was generated",
+                    type:"success"
+                });
+            }).error(function() {
+                sweetAlert("Something wrong", "Error was occured when trying to generate data", "error");
+            });;
         });
     </script>
 {% endblock %}

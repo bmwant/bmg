@@ -33,6 +33,7 @@ class Creator(object):
         self.css_framework = cssframework
 
         self.NEED_COMPILE = ('__init__.py', 'config.py', 'models.py',)
+        self.EXCLUDE = ('forms_header.py', 'views_header.py',)
 
         self.run_port = randint(21721, 65535)  # port from BMG-default port to max possible
         self.secret_key = os.urandom(16).encode('hex')
@@ -45,28 +46,36 @@ class Creator(object):
         logger.info('Creating project structure for [%s]' % self.project_name)
 
         #templates
+        logger.info('Copying template files of %s' % self.css_framework)
         shutil.copytree(fj('boilerplate/templates', self.css_framework),
                         fj(dir_name, 'templates'))
 
         #css
+        logger.info('Copying css files of %s' % self.css_framework)
         shutil.copytree(fj('boilerplate/static/css', self.css_framework),
                         fj(dir_name, 'static/css'))
 
         #js
+        logger.info('Copying js files of %s' % self.css_framework)
         shutil.copytree(fj('boilerplate/static/js', self.css_framework),
                         fj(dir_name, 'static/js'))
 
         #app folder
-        shutil.copytree('boilerplate/app', fj(dir_name, 'app'))
+        logger.info('Copying main application files')
+        os.makedirs(fj(self.project_dir, 'app'))
+        self.copy_files('boilerplate/app', fj(self.project_dir, 'app'),
+                        exclude=self.EXCLUDE)
 
         #and other files
-        self.copy_files('boilerplate')
+        self.copy_files('boilerplate', self.project_dir)
 
         self.fill_project_data()
 
-    def copy_files(self, directory):
+    def copy_files(self, directory, where, exclude=None):
         for file_name in get_only_files(directory):
-            shutil.copy(file_name, self.project_dir)
+            if exclude is not None and os.path.basename(file_name) in exclude:
+                continue
+            shutil.copy(file_name, where)
 
     def fill_project_data(self):
         dir_name = self.project_name.lower()
@@ -75,9 +84,8 @@ class Creator(object):
             if file_name in self.NEED_COMPILE:
                 self.compile_module(module_file)
 
-
     def compile_module(self, module_file):
-        print('Compiling %s' % module_file)
+        logger.info('Filling %s with project data' % module_file)
 
         with open(module_file, 'r') as fin:
             template = fin.read()

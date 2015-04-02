@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from bottle import static_file, error, request, post
-
+from app import app, env, config
 
 from models import *
-
-#from gen_views import *
 from helpers import *
 
-from app import app, env, config
+try:
+    from gen_views import *
+except ImportError:
+    pass
 
 
 @app.get('/')

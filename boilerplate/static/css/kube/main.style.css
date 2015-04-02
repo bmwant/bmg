@@ -29,3 +29,15 @@
   background: #ffc800;
   color: #000;
 }
+
+.controls {
+    float: right;
+}
+
+#update-button {
+    display: none;
+}
+
+#cancel-button {
+    display: none;
+}
