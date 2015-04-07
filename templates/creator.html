@@ -57,12 +57,12 @@
 
             <div class="three columns">
                 <label>Connection host</label>
-                <input class="u-full-width" type="text" name="host" placeholder="127.0.0.1" required value="{{ this.host }}">
+                <input class="u-full-width" type="text" name="host" placeholder="localhost" required value="{{ this.host }}">
             </div>
 
             <div class="three columns">
                 <label>Connection port</label>
-                <input class="u-full-width" type="number" name="port" placeholder="3306" value="{{ this.port }}">
+                <input class="u-full-width" type="number" name="port" placeholder="Your port" value="{{ this.port }}">
             </div>
 
         </div>
@@ -166,7 +166,49 @@
             $("#form-row-3").css("display", "block");
             localStorage.setItem("with_db", 1);
         }
+
+        var portInput = $("input[name=port]");
+        var hostInput = $("input[name=host]");
+        if(selectedBackend == "sqlite") {
+            hideAdvanced();
+
+        } else if(selectedBackend == "postgresql") {
+            showAdvanced();
+            if(!presentInLS("port")) {
+                portInput.val(5432);
+            }
+            if(!presentInLS("host")) {
+                hostInput.val("127.0.0.1");
+            }
+        } else if (selectedBackend == "mysql") {
+            showAdvanced();
+            if(!presentInLS("port")) {
+                portInput.val(3306);
+            }
+            if(!presentInLS("host")) {
+                hostInput.val("127.0.0.1");
+            }
+        }
     });
+
+    function presentInLS(key) {
+        var value = localStorage.getItem(key);
+        return (value != undefined) && (value != "") && (value != null);
+    }
+
+    function hideAdvanced() {
+        $("input[name=host]").parent().hide();
+        $("input[name=port]").parent().hide();
+        $("input[name=username]").parent().hide();
+        $("input[name=password]").parent().hide();
+    }
+
+    function showAdvanced() {
+        $("input[name=host]").parent().show();
+        $("input[name=port]").parent().show();
+        $("input[name=username]").parent().show();
+        $("input[name=password]").parent().show();
+    }
 
     function loadPage(pageNum) {
         //Check if exist
@@ -258,7 +300,7 @@
                 location = '/done';
             });
         }).error(function() {
-            sweetAlert("Server error", "Check your input and try again", "error");
+            sweetAlert("Something wrong", "Check your input and try again", "error");
         });
     });
 </script>

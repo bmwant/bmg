@@ -13,7 +13,7 @@ import importlib
 
 
 from playhouse.reflection import Introspector
-from peewee import print_, MySQLDatabase
+from peewee import print_, MySQLDatabase, SqliteDatabase, PostgresqlDatabase
 from jinja2 import Template
 
 
@@ -35,11 +35,24 @@ PEEWEE_TO_WTFORMS = {
 
 class Generator(object):
 
-    def __init__(self, module_name=None, project_name=None):
-        pass
+    def __init__(self, project):
+        self.project = project
 
     def introspect(self):
-        db = MySQLDatabase('bmgtest', host='127.0.0.1', port=3306, user='root', password='')
+        backend = self.project['db_backend']
+        if backend == 'mysql':
+            db = MySQLDatabase(self.project['db_name'],
+                               host=self.project['db_host'], port=self.project['db_port'],
+                               user=self.project['db_user'], password=self.project['db_password'])
+        elif backend == 'postgresql':
+            print(self.project)
+            db = PostgresqlDatabase(self.project['db_name'],
+                                    host=self.project['db_host'], port=self.project['db_port'],
+                                    user=self.project['db_user'], password=self.project['db_password'])
+        elif backend == 'sqlite':
+            path_to_db = 'benedict/' + self.project['db_name']
+            print(path_to_db)
+            db = SqliteDatabase(path_to_db)
         introspector = Introspector.from_database(db)
         with to_file('benedict/app/models.py'):
             self.print_models(introspector)

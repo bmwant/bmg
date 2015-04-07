@@ -32,7 +32,8 @@ class Creator(object):
             self.db_port = port
         self.css_framework = cssframework
 
-        self.NEED_COMPILE = ('__init__.py', 'config.py', 'models.py',)
+        self.NEED_COMPILE = ('__init__.py', 'config.py', 'models.py',
+                             'helpers.py', )
         self.EXCLUDE = ('forms_header.py', 'views_header.py',)
 
         self.run_port = randint(21721, 65535)  # port from BMG-default port to max possible
@@ -70,6 +71,7 @@ class Creator(object):
         self.copy_files('boilerplate', self.project_dir)
 
         self.fill_project_data()
+        return self.__dict__
 
     def copy_files(self, directory, where, exclude=None):
         for file_name in get_only_files(directory):

@@ -1,7 +1,9 @@
 import json
 import logging
 
-from bottle import route, static_file, request, post, get
+from functools import wraps
+
+from bottle import route, static_file, request, post, get, abort
 
 from bmgapp import view, render_template
 from bmgapp.creator import Creator
@@ -23,7 +25,19 @@ def hello():
 def index(): pass
 
 
-current_project = {}
+current_project = {
+    'created': False
+}
+
+
+def with_project(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if not current_project['created']:
+            return abort(403, 'You need prepared project first')
+        result = func(*args, **kwargs)
+        return result
+    return wrapper
 
 """ Create project section """
 
@@ -37,14 +51,18 @@ def creator():
 @route('/create', method=['POST'])
 def create():
     c = Creator(**request.POST)
-    c.create()
-    current_project['run_port'] = c.run_port
+    result = c.create()
+    #todo: update dictionary with values returned from create()
+    current_project['created'] = True
+    current_project.update(result)
+    print(current_project)
     return 'Ok'
 
 
 @route('/done')
+@with_project
 def done():
-    return render_template('done.html', **current_project)
+    return render_template('done_creation.html', **current_project)
 
 
 """ Generate code section """
@@ -58,8 +76,9 @@ def generator():
 
 
 @route('/check_models')
+@with_project
 def check_models():
-    g = Generator()
+    g = Generator(current_project)
     models_list = g.get_models(request.GET['module'])
     return json.dumps(models_list)
 
@@ -71,16 +90,18 @@ def generator_select():
 
 
 @post('/generate')
+@with_project
 def generate():
-    g = Generator()
+    g = Generator(current_project)
     print(request.POST.items())
     g.generate_model_data(module_name=None, model_name=request.POST['model-class'])  #todo: project-specific data from global dict
     return 'Ok'
 
 
 @route('/inspect')
+@with_project
 def inspect():
-    g = Generator()
+    g = Generator(current_project)
     g.introspect()
     return 'Ok'
 

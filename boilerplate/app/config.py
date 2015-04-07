@@ -8,10 +8,12 @@ class Config(object):
     RUN_PORT = {{ run_port }}
     {% if with_db %}
     DB_NAME = '{{ db_name }}'
+    {% if db_backend != 'sqlite' %}
     DB_USER = '{{ db_user }}'
     DB_PASS = '{{ db_password }}'
     DB_HOST = '{{ db_host }}'
     DB_PORT = {{ db_port }}
+    {% endif %}
     {% endif %}
 
 class DevelopmentConfig(Config):
