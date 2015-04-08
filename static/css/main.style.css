@@ -50,3 +50,7 @@ pre > code {
     border: 2px solid #F27474;
     border-radius: 4px;
 }
+
+input.error, input.error:focus, input.error:active {
+    border: 2px solid #F27474;
+}

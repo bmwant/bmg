@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+    {{ super() }}
+    <script src="/static/js/jquery.validate.min.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="container" id="page-container">
     <div class="row">
@@ -21,7 +26,7 @@
         <div class="row">
             <div class="six columns">
                 <label>Enter project name</label>
-                <input class="u-full-width" type="text" placeholder="Application" name="name" value="{{ this.name }}">
+                <input class="u-full-width" type="text" placeholder="Application" name="name" value="{{ this.name }}" required>
             </div>
         </div>
     </div>
@@ -52,17 +57,17 @@
 
             <div class="three columns">
                 <label>Database name</label>
-                <input class="u-full-width" type="text" name="dbname" placeholder="appdb" required value="{{ this.dbname }}">
+                <input class="u-full-width" type="text" name="dbname" placeholder="appdb" required value="{{ this.dbname }}" required>
             </div>
 
             <div class="three columns">
                 <label>Connection host</label>
-                <input class="u-full-width" type="text" name="host" placeholder="localhost" required value="{{ this.host }}">
+                <input class="u-full-width" type="text" name="host" placeholder="localhost" required value="{{ this.host }}" required>
             </div>
 
             <div class="three columns">
                 <label>Connection port</label>
-                <input class="u-full-width" type="number" name="port" placeholder="Your port" value="{{ this.port }}">
+                <input class="u-full-width" type="number" name="port" placeholder="Your port" value="{{ this.port }}" required>
             </div>
 
         </div>
@@ -71,11 +76,11 @@
 
             <div class="three columns">
                 <label>Username</label>
-                <input class="u-full-width" name="username" type="text"  placeholder="Your username" value="{{ this.username }}">
+                <input class="u-full-width" name="username" type="text"  placeholder="Your username" value="{{ this.username }}" required>
             </div>
             <div class="three columns">
                 <label>Password</label>
-                <input class="u-full-width" name="password" type="password" placeholder="Your password" value="{{ this.password }}">
+                <input class="u-full-width" name="password" type="password" placeholder="Your password" value="{{ this.password }}" required>
             </div>
 
         </div>
@@ -140,6 +145,10 @@
 
 {% block bottom_scripts %}
 <script>
+
+</script>
+
+<script>
     $(document).ready(function() {
         //Enable resuming from the last page
         if(!localStorage.currentPageNum) {
@@ -151,7 +160,6 @@
 
     $(document).on("change", "select[name=dbbackend]", function() {
         var form = $("#form-container").find("form");
-        console.log(form);
         $.each(form, function(key, value) {
             console.log(value);
         });
@@ -250,6 +258,15 @@
         });
     }
 
+    function validateForm() {
+        var formContainer = $("#form-container");
+        var form = formContainer.find("form");
+        form.validate({
+            errorPlacement: function(error, element) {}
+        });
+        return form.valid();
+    }
+
     $("#prev-button").click(function() {
         var prevPageNum = Number(localStorage.currentPageNum) - 1;
         if(prevPageNum < 1) {
@@ -260,6 +277,7 @@
     });
 
     $("#next-button").click(function() {
+        if(!validateForm()) return;
         saveDataToLS();
         var nextPageNum = Number(localStorage.currentPageNum) + 1;
         loadPage(nextPageNum);
