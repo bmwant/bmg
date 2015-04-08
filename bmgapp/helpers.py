@@ -4,6 +4,8 @@ import os
 import sys
 import contextlib
 
+fj = os.path.join  # Folder join
+
 
 @contextlib.contextmanager
 def to_file(where):

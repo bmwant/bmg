@@ -17,10 +17,11 @@ from peewee import print_, MySQLDatabase, SqliteDatabase, PostgresqlDatabase
 from jinja2 import Template
 
 
-from .helpers import to_file
+from .helpers import to_file, fj
 
 
 logger = logging.getLogger(__name__)
+
 
 FORMS_FILE = 'benedict/app/gen_forms.py'
 VIEWS_FILE = 'benedict/app/gen_views.py'
@@ -36,25 +37,24 @@ PEEWEE_TO_WTFORMS = {
 class Generator(object):
 
     def __init__(self, project):
-        self.project = project
+        self.__dict__.update(project)
 
     def introspect(self):
-        backend = self.project['db_backend']
+        backend = self.db_backend
         if backend == 'mysql':
-            db = MySQLDatabase(self.project['db_name'],
-                               host=self.project['db_host'], port=self.project['db_port'],
-                               user=self.project['db_user'], password=self.project['db_password'])
+            db = MySQLDatabase(self.db_name,
+                               host=self.db_host, port=self.db_port,
+                               user=self.db_user, password=self.db_password)
         elif backend == 'postgresql':
-            print(self.project)
-            db = PostgresqlDatabase(self.project['db_name'],
-                                    host=self.project['db_host'], port=self.project['db_port'],
-                                    user=self.project['db_user'], password=self.project['db_password'])
+            db = PostgresqlDatabase(self.db_name,
+                                    host=self.db_host, port=self.db_port,
+                                    user=self.db_user, password=self.db_password)
         elif backend == 'sqlite':
-            path_to_db = 'benedict/' + self.project['db_name']
+            path_to_db = fj(self.project_dir, self.db_name)
             print(path_to_db)
             db = SqliteDatabase(path_to_db)
         introspector = Introspector.from_database(db)
-        with to_file('benedict/app/models.py'):
+        with to_file(fj(self.project_dir, 'app/models.py')):
             self.print_models(introspector)
 
     def print_models(self, introspector, tables=None):
@@ -123,7 +123,7 @@ class Generator(object):
         module_name = os.path.splitext(models_file)[0]
         module = 'app.%s' % module_name
         pyclbr._modules = {}  # Clear cache
-        m = pyclbr.readmodule(module, path=['benedict'])  #todo: project_name
+        m = pyclbr.readmodule(module, path=[self.project_dir])
         logger.info('Checking module %s for peewee-models' % models_file)
         for value in m.itervalues():
             if value.module == module:
@@ -136,9 +136,9 @@ class Generator(object):
     def generate_model_data(self, module_name=None, model_name=None):
         self.create_files()
 
-        sys.path.insert(0, 'benedict')  #todo: project_name
-        models = importlib.import_module('app.models')  #todo: models-file name
-        print('Here')
+        sys.path.insert(0, self.project_dir)
+        md_name = os.path.splitext(module_name)[0]
+        models = importlib.import_module('app.%s' % md_name)
         for name, obj in inspect.getmembers(models, inspect.isclass):
             if obj.__module__ == models.__name__:
                 print(obj.__name__, model_name)
@@ -148,17 +148,19 @@ class Generator(object):
 
     def generate_view(self, view_name, model_name):
         #log action
-        v = ViewCreator(view_name, model_name)
+        v = ViewCreator(view_name, model_name,
+                        project_dir=self.project_dir,
+                        css_framework=self.css_framework)
         v.write()
 
     def create_files(self):
         if not os.path.exists(FORMS_FILE):
             logger.info('Initial creating of generated forms file')
-            shutil.copyfile('boilerplate/app/forms_header.py', 'benedict/app/gen_forms.py')  #todo: project name
+            shutil.copyfile('boilerplate/app/forms_header.py', fj(self.project_dir, 'app/gen_forms.py'))
 
         if not os.path.exists(VIEWS_FILE):
             logger.info('Initial creating of generated views file')
-            shutil.copyfile('boilerplate/app/views_header.py', 'benedict/app/gen_views.py')  #todo: project name
+            shutil.copyfile('boilerplate/app/views_header.py', fj(self.project_dir, 'app/gen_views.py'))
 
     def _create(self, obj):
         logger.info('Creating all for %s' % obj.__name__)
@@ -223,9 +225,11 @@ def {{ view_name }}_delete({{ view_name }}_id):
     })
 """
 
-    def __init__(self, name, peewee_model):
+    def __init__(self, name, peewee_model, project_dir, css_framework='html'):
         self.name = name
         self.peewee_model = peewee_model
+        self.project_dir = project_dir
+        self.css_framework = css_framework
 
     def write(self):
         t = Template(self.template)
@@ -234,13 +238,13 @@ def {{ view_name }}_delete({{ view_name }}_id):
         with open(VIEWS_FILE, 'a') as fout:
             fout.writelines(bottle_view)
 
-        destination = 'benedict/templates/gen_views'  #todo: project name
+        destination = fj(self.project_dir, 'templates/gen_views')
         if not os.path.exists(destination):
             os.makedirs(destination)
         self.create_template(destination)
 
     def create_template(self, dest):
-        templates_dir = 'boilerplate/templates/kube' #todo: you know not kube
+        templates_dir = fj('boilerplate/templates', self.css_framework)
         shutil.copyfile('{0}/blueprint.html'.format(templates_dir),
                  '{0}/{1}_admin.html'.format(dest, self.name))
 

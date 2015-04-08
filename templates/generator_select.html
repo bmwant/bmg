@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container" id="page-container">
-    <h2>Generate boilerblate code.</h2>
+    <h2>Generate boilerblate code for {{ project }}</h2>
     <div class="row">
 
         <div class="six columns">
@@ -19,7 +19,7 @@
                 python-module (<em>models.py</em> by default) and <strong>BMG</strong>
                 will generate them for you alongside with other files.
             </p>
-            <a class="button" href="/gen">Generate on models</a>
+            <a class="button" href="/gen_models">Generate on models</a>
         </div>
     </div>
 </div>
@@ -37,10 +37,11 @@
                     type: "success"
                 },
                 function() {
-                    location = '/gen';
+                    location = '/gen_models';
                 });
-            }).error(function() {
-                sweetAlert("Server error", "Something wrong with database inspecting", "error");
+            }).error(function(event) {
+                var error = event.responseText;
+                sweetAlert("Strange error", error, "error");
             });
         });
     </script>

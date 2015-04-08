@@ -2,104 +2,48 @@
 
 {% block content %}
 <div class="container" id="page-container">
-    <h2>Generate boilerblate code.</h2>
+    <h2>Project for generating</h2>
     <div class="row">
 
         <div class="six columns">
-            <form>
-                <div class="row">
-                    <div class="six-columns">
-                        <label>Select models file</label>
-                        <select class="u-full-width" name="module">
-                            {% for module in modules %}
-                            <option value="{{ module }}">{{ module }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-            </form>
-            <a class="button" href="#" onclick="return false;" id="check-button">Check models</a>
+
+            {% if projects %}
+                <form method="post" action="/gen_select">
+                    <label>Select project</label>
+                    <select class="u-full-width" name="project">
+                        {% for p in projects %}
+                            <option value="{{ p }}">{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <a class="button submit-button" href="#" onclick="return false;">Take it</a>
+            {% else %}
+                <p class="caution">You have no previously created projects by BMG
+                    or all your projects don't have database connection. Go back
+                    and create some (don't forget to establish db connection).</p>
+            {% endif %}
+
         </div>
 
         <div class="six columns" id="second-row">
+
         </div>
+
     </div>
 </div>
 
-{% raw %}
-<script id="select-class-view" type="text/x-handlebars-template">
-<form>
-    <div class="row">
-        <div class="six-columns">
-            {{#if this }}
-            <label>Select model class</label>
-            <select class="u-full-width" name="model-class">
-                {{#each this }}
-                <option value="{{ this }}">{{ this }}</option>
-                {{/each }}
-            </select>
 
-            <label class="example-send-yourself-copy">
-                <input type="checkbox" checked name="forms-check">
-                <span class="label-body">Forms</span>
-            </label>
-
-            <label class="example-send-yourself-copy">
-                <input type="checkbox" checked name="templates-check">
-                <span class="label-body">Templates</span>
-            </label>
-
-            <label class="example-send-yourself-copy">
-                <input type="checkbox" checked name="views-check">
-                <span class="label-body">Views</span>
-            </label>
-            {{else }}
-            <p class="caution">Seems like this is not models-file or you have not
-            wrote there models yet. Write them or try to select another file (<em>models.py</em>
-            by default).
-            </p>
-            {{/if }}
-        </div>
-    </div>
-</form>
-{{#if this }}
-<a class="button button-primary" href="#" onclick="return false;" id="generate-button">Generate</a>
-{{/if }}
-</script>
-{% endraw %}
 {% endblock %}
 
 
 {% block bottom_scripts %}
     {{ super() }}
     <script>
-        $("#check-button").click(function () {
-            $.getJSON("/check_models", {
-                module: $("select[name=module]").val()
-            }, function(data) {
-                var source = $("#select-class-view").html();
-                var template = Handlebars.compile(source);
-                var resHtml = template(data);
-                $("#second-row").html(resHtml);
+        $(document).ready(function() {
+            $(".submit-button").click(function() {
+                var form = $(this).parent().find("form");
+                form.submit();
             });
-        });
-
-        $("select[name=module]").change(function() {
-            $("#second-row").empty();
-        });
-
-        $(document).on("click", "#generate-button", function () {
-            var form = $("#second-row").find("form");
-            var data = form.serialize();
-            $.post("/generate", data, function(data) {
-                sweetAlert({
-                    title: "Great news",
-                    text: "All data for the model was generated",
-                    type:"success"
-                });
-            }).error(function() {
-                sweetAlert("Something wrong", "Error was occured when trying to generate data", "error");
-            });;
         });
     </script>
 {% endblock %}

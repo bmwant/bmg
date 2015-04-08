@@ -4,14 +4,14 @@ import os
 import logging
 import shutil
 
+import yaml
+
 from random import randint
 from jinja2 import Template
 
-from .helpers import get_list_of_files, get_only_files
+from .helpers import get_list_of_files, get_only_files, fj
 
 logger = logging.getLogger(__name__)
-
-fj = os.path.join  # Folder join
 
 
 class Creator(object):
@@ -71,7 +71,21 @@ class Creator(object):
         self.copy_files('boilerplate', self.project_dir)
 
         self.fill_project_data()
-        return self.__dict__
+        project_result = self.__dict__
+        self.save_project_info()
+        return project_result
+
+    def save_project_info(self):
+        project_result = self.__dict__
+        projects = {}
+        if os.path.exists('.bmgprojects'):
+            with open('.bmgprojects') as fin:
+                projects.update(yaml.load(fin))
+        projects[self.project_name] = project_result
+
+        with open('.bmgprojects', 'a') as fout:
+            fout.write(yaml.dump(projects))
+
 
     def copy_files(self, directory, where, exclude=None):
         for file_name in get_only_files(directory):
