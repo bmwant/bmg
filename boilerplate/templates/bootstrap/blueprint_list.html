@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}:: Автоматично згенеровано{% endblock %}
+
+{% block content %}
+<div class="row">
+
+    <div class="col-lg-6">
+
+        {% if items.count() %}
+            <table class="table-stripped">
+                {% for item in items %}
+                    <tr class="list-item">
+                        <td>{{ item }}</td>
+                        <td>
+                            <span class="controls">
+                                <span class="edit-item"><a  href="#" onclick="return false;" class="bold color theme"><i data-item-id="{{ item.id }}" class="fa fa-pencil"></i></a></span>
+                                <span class="delete-item"><a href="#" onclick="return false;" class="bold color theme"><i data-item-id="{{ item.id }}" class="fa fa-times"></i></a></span>
+                            </span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+        {% else %}
+            <h2 class="no-list-results">Жодного елемента у списку</h2>
+        {% endif %}
+
+    </div>
+
+    <div class="col-lg-6">
+
+        <form id="admin-form" action="" method="post" class="forms">
+            <fieldset>
+                <legend>Додати новий</legend>
+                {% for field in form %}
+                    <label>
+                        {{ field.label.text }}
+                        {{ field(class_="width-100") }}
+                    </label>
+                {% endfor %}
+            </fieldset>
+            <p>
+                <a id="add-button" class="btn btn-yellow" href="#" onclick="return false;"> Додати</a>
+                <a id="update-button" class="btn btn-yellow btn-outline" href="#" onclick="return false;"> Оновити</a>
+                <a id="cancel-button" class="btn btn-black btn-outline" href="#" onclick="return false;"> Скасувати</a>
+            </p>
+        </form>
+        <div class="error-text">
+            {% if form.errors %}
+                <ul class="errors">
+                    {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+                        {% for error in field_errors %}
+                            <li>{{ form[field_name].label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block bottom_scripts %}
+    {{ super() }}
+    <script>
+    $(document).ready(function() {
+        var actionLink = window.location.href;
+        var form = $("#admin-form");
+
+        $(".edit-item").click(function (event) {
+            var itemId = $(event.target).data("item-id");
+            var editUrl = actionLink + "/edit/" + itemId;
+            $.getJSON(editUrl, function (data) {
+                $.each(data, function (key, value) {
+                    var element = $("#" + key);
+                    if (element.length) {
+                        console.log(element);
+                        element.val(value);
+                    }
+                });
+                $("#cancel-button").css("display", "inline-block");
+                $("#update-button").css("display", "inline-block");
+                $("#add-button").css("display", "none");
+                form.attr("action", editUrl);
+            });
+        });
+
+        $("#cancel-button").click(function() {
+            $(this).css("display", "none");
+            $("#update-button").css("display", "none");
+            $("#add-button").css("display", "inline-block");
+            $("#admin-form").trigger("reset");
+        });
+
+        $(".delete-item").click(function(event) {
+            var itemId = $(event.target).data("item-id");
+            var url = actionLink + "/delete/" + itemId;
+            console.log($(this));
+            var listItem = $(this).closest(".list-item");
+            $.getJSON(url, function(data) {
+                if(data.status == "success") {
+                    listItem.remove();
+                }
+            });
+        });
+
+        $("#add-button").click(function() {
+            form.attr("action", "");
+            form.submit();
+            //form.trigger("reset");
+        });
+
+        $("#update-button").click(function() {
+            form.submit();
+        });
+
+    });
+    </script>
+
+{% endblock %}

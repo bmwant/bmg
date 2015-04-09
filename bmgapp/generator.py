@@ -23,8 +23,8 @@ from .helpers import to_file, fj
 logger = logging.getLogger(__name__)
 
 
-FORMS_FILE = 'benedict/app/gen_forms.py'
-VIEWS_FILE = 'benedict/app/gen_views.py'
+FORMS_FILE = 'app/gen_forms.py'
+VIEWS_FILE = 'app/gen_views.py'
 
 PEEWEE_TO_WTFORMS = {
     peewee.CharField: wtforms.StringField,
@@ -41,9 +41,10 @@ class Generator(object):
 
     def introspect(self):
         backend = self.db_backend
+        print(self.__dict__)
         if backend == 'mysql':
             db = MySQLDatabase(self.db_name,
-                               host=self.db_host, port=self.db_port,
+                               host=self.db_host, port=int(self.db_port),
                                user=self.db_user, password=self.db_password)
         elif backend == 'postgresql':
             db = PostgresqlDatabase(self.db_name,
@@ -154,13 +155,13 @@ class Generator(object):
         v.write()
 
     def create_files(self):
-        if not os.path.exists(FORMS_FILE):
+        if not os.path.exists(fj(self.project_dir, FORMS_FILE)):
             logger.info('Initial creating of generated forms file')
-            shutil.copyfile('boilerplate/app/forms_header.py', fj(self.project_dir, 'app/gen_forms.py'))
+            shutil.copyfile('boilerplate/app/forms_header.py', fj(self.project_dir, FORMS_FILE))
 
-        if not os.path.exists(VIEWS_FILE):
+        if not os.path.exists(fj(self.project_dir, VIEWS_FILE)):
             logger.info('Initial creating of generated views file')
-            shutil.copyfile('boilerplate/app/views_header.py', fj(self.project_dir, 'app/gen_views.py'))
+            shutil.copyfile('boilerplate/app/views_header.py', fj(self.project_dir, VIEWS_FILE))
 
     def _create(self, obj):
         logger.info('Creating all for %s' % obj.__name__)
@@ -168,7 +169,7 @@ class Generator(object):
         new_view_name = obj.__name__.lower()
 
         #new_form_class = type(new_form_name, (wtforms.Form, ), {})
-        f = FormsCreator(new_form_name)
+        f = FormsCreator(new_form_name, self.project_dir)
         for field_name, field in vars(obj).iteritems():
             if isinstance(field, peewee.FieldDescriptor):
                 for key in PEEWEE_TO_WTFORMS.iterkeys():
@@ -195,6 +196,12 @@ def {{ view_name }}_admin():
             new_item = {{ peewee_model }}.create(**form.data)
             form = {{ peewee_model }}Form()
     return template.render(items=items, form=form)
+
+
+@app.get('/{{ view_name }}/<{{ view_name }}_id:int>')
+def {{ view_name }}_view({{ view_name }}_id):
+    item = {{ peewee_model }}.get_or_404({{ peewee_model}}.id == {{ view_name }}_id)
+    return render_template('gen_views/{{ views_name }}_view.html', item=item)
 
 
 @app.route('/{{ view_name }}_admin/edit/<{{ view_name }}_id:int>', method=['GET', 'POST'])
@@ -235,7 +242,7 @@ def {{ view_name }}_delete({{ view_name }}_id):
         t = Template(self.template)
         bottle_view = t.render(view_name=self.name,
                                peewee_model=self.peewee_model)
-        with open(VIEWS_FILE, 'a') as fout:
+        with open(fj(self.project_dir, VIEWS_FILE), 'a') as fout:
             fout.writelines(bottle_view)
 
         destination = fj(self.project_dir, 'templates/gen_views')
@@ -245,8 +252,12 @@ def {{ view_name }}_delete({{ view_name }}_id):
 
     def create_template(self, dest):
         templates_dir = fj('boilerplate/templates', self.css_framework)
-        shutil.copyfile('{0}/blueprint.html'.format(templates_dir),
-                 '{0}/{1}_admin.html'.format(dest, self.name))
+        shutil.copyfile('{0}/blueprint_admin.html'.format(templates_dir),
+                        '{0}/{1}_admin.html'.format(dest, self.name))
+        shutil.copyfile('{0}/blueprint_view.html'.format(templates_dir),
+                        '{0}/{1}_view.html'.format(dest, self.name))
+        shutil.copyfile('{0}/blueprint_list.html'.format(templates_dir),
+                        '{0}/{1}_list.html'.format(dest, self.name))
 
 
 class FormsCreator():
@@ -258,8 +269,9 @@ class {{ class_name }}(Form):
     {% endfor %}
 """
 
-    def __init__(self, name):
+    def __init__(self, name, project_dir):
         self.name = name
+        self.project_dir = project_dir
         self.fields = []
 
     def add_field(self, field_name, field_type):
@@ -270,5 +282,5 @@ class {{ class_name }}(Form):
         return t.render(class_name=self.name, class_fields=self.fields)
 
     def write(self):
-        with open(FORMS_FILE, 'a') as fout:
+        with open(fj(self.project_dir, FORMS_FILE), 'a') as fout:
             fout.writelines(self.render())

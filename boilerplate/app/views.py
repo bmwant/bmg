@@ -31,3 +31,8 @@ if config.DEBUG:
     @app.get('/<folder>/<filename:path>')
     def server_static(folder, filename):
         return static_file(filename, root=config.STATIC_FOLDER+folder)
+
+    #favicon :)
+    @app.route('/favicon.ico')
+    def serve_favicon():
+        return static_file('favicon.ico', root=config.STATIC_FOLDER)

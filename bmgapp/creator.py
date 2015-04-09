@@ -16,6 +16,10 @@ logger = logging.getLogger(__name__)
 
 class Creator(object):
 
+    NEED_COMPILE = ('__init__.py', 'config.py', 'models.py', 'helpers.py', )
+    EXCLUDE = ('forms_header.py', 'views_header.py',)
+    CONFIG_FILE = '.bmgprojects'
+
     def __init__(self, name, username, dbbackend, port, host, password, dbname, cssframework, *args, **kwargs):
         self.project_name = name
         self.project_dir = name.lower()
@@ -31,10 +35,6 @@ class Creator(object):
             self.db_host = host
             self.db_port = port
         self.css_framework = cssframework
-
-        self.NEED_COMPILE = ('__init__.py', 'config.py', 'models.py',
-                             'helpers.py', )
-        self.EXCLUDE = ('forms_header.py', 'views_header.py',)
 
         self.run_port = randint(21721, 65535)  # port from BMG-default port to max possible
         self.secret_key = os.urandom(16).encode('hex')
@@ -69,6 +69,7 @@ class Creator(object):
 
         #and other files
         self.copy_files('boilerplate', self.project_dir)
+        self.copy_files('boilerplate/static', fj(self.project_dir, 'static'))  # favicon
 
         self.fill_project_data()
         project_result = self.__dict__

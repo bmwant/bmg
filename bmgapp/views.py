@@ -136,6 +136,7 @@ def generate():
     Generates selected data for current project based on 'model_name'-model
     from 'module'-module
     """
+    print(request.POST.items())
     g = Generator(current_project)
     g.generate_model_data(module_name=request.POST['module'],
                           model_name=request.POST['model-class'])

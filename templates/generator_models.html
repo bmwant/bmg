@@ -5,7 +5,7 @@
     <h2>Generate boilerblate code.</h2>
     <div class="row">
 
-        <div class="six columns">
+        <div class="six columns" id="first-row">
             <form>
                 <div class="row">
                     <div class="six-columns">
@@ -90,7 +90,8 @@
 
         $(document).on("click", "#generate-button", function () {
             var form = $("#second-row").find("form");
-            var data = form.serialize();
+            var modelsForm = $("#first-row").find("form");
+            var data = form.serialize() + "&" + modelsForm.serialize();
             $.post("/generate", data, function(data) {
                 sweetAlert({
                     title: "Great news",
